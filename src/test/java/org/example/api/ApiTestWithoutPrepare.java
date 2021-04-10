@@ -5,6 +5,7 @@ import io.restassured.http.Header;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
+import java.util.Random;
 
 import static io.restassured.RestAssured.given;
 
@@ -14,17 +15,17 @@ public class ApiTestWithoutPrepare {
     @Test
     public void testGet() throws IOException {
         // Читаем конфигурационный файл в System.properties
-        System.getProperties().load(ClassLoader.getSystemResourceAsStream("my.properties"));
+//        System.getProperties().load(ClassLoader.getSystemResourceAsStream("my.properties"));
         given()//ДАНО:
                 .baseUri("https://petstore.swagger.io/v2/") // задаём базовый адрес каждого ресурса
-                .header(new Header("api_key", System.getProperty("api.key")))// задаём заголовок с токеном для авторизации
+                .header(new Header("api_key", "special-key"))// задаём заголовок с токеном для авторизации
                 .accept(ContentType.JSON)// задаём заголовок accept
-                .pathParam("petId", System.getProperty("petId"))// заранее задаём переменную petId
-                                               //(так как это просто пример, нужно убедиться, что объект с таким Id существует)
+                .pathParam("petId", new Header("api_key", System.getProperty("api.key")))// заранее задаём переменную petId
+                //(так как это просто пример, нужно убедиться, что объект с таким Id существует)
                 .log().all()//задаём логгирование запроса
-            .when()//КОГДА:
+                .when()//КОГДА:
                 .get("/pet/{petId}") // переменная petId подставится в путь ресурса перед выполнением запроса GET
-            .then()// ТОГДА:
+                .then()// ТОГДА:
                 .statusCode(200) //проверка кода ответа
                 .log().all(); //задаём логгирование ответа
 
